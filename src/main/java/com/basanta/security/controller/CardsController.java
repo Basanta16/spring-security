@@ -5,10 +5,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class WelcomeController {
+public class CardsController {
 
-    @GetMapping("/welcome")
-    public String sayWelcome() {
-        return "Welcome to Spring Security with security";
+    @GetMapping("/api/myCards")
+    public String getCardsDetails(){
+        return "My Cards Details are from DB";
     }
+
 }
