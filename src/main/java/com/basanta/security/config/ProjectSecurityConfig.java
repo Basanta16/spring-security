@@ -1,10 +1,18 @@
 package com.basanta.security.config;
 
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
+import javax.sql.DataSource;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -14,7 +22,7 @@ public class ProjectSecurityConfig {
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((requests)-> requests
-                .requestMatchers("/api/..").authenticated()
+                .requestMatchers("/api/**").authenticated()
                 .requestMatchers("/notices", "/contacts", "/error").permitAll());
 //        http.authorizeHttpRequests((requests)-> requests.anyRequest().denyAll());
 //        http.authorizeHttpRequests((requests)-> requests.anyRequest().permitAll());
@@ -22,4 +30,26 @@ public class ProjectSecurityConfig {
         http.httpBasic(withDefaults());
         return http.build();
     }
+
+    @Bean
+    public UserDetailsService userDetailsService(DataSource dataSource) {
+        return new JdbcUserDetailsManager(dataSource);
+    }
+
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        UserDetails user = User.withUsername("user").password("{noop}Basanta@123").authorities("read").build();
+//        UserDetails admin = User.withUsername("admin").password("{bcrypt}$2a$12$Skp74WcE42I8e9MlrWCaWuiQC.rSyOyyi60FFxs7WfSC7PAjcwe8i").authorities("admin").build();
+//        return new InMemoryUserDetailsManager(user, admin);
+//    }
+//
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+//    }
+//
+//    @Bean
+//    public CompromisedPasswordChecker compromisedPasswordChecker(){
+//        return new HaveIBeenPwnedRestApiPasswordChecker();
+//    }
 }
