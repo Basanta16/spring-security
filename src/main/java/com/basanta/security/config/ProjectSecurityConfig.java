@@ -21,9 +21,11 @@ public class ProjectSecurityConfig {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests((requests)-> requests
+        http
+                .csrf(csrfConfig -> csrfConfig.disable())
+                .authorizeHttpRequests((requests)-> requests
                 .requestMatchers("/api/**").authenticated()
-                .requestMatchers("/notices", "/contacts", "/error").permitAll());
+                .requestMatchers("/notices", "/contacts", "/error", "/register").permitAll());
 //        http.authorizeHttpRequests((requests)-> requests.anyRequest().denyAll());
 //        http.authorizeHttpRequests((requests)-> requests.anyRequest().permitAll());
         http.formLogin(withDefaults());
@@ -31,10 +33,10 @@ public class ProjectSecurityConfig {
         return http.build();
     }
 
-    @Bean
+    /*@Bean
     public UserDetailsService userDetailsService(DataSource dataSource) {
         return new JdbcUserDetailsManager(dataSource);
-    }
+    }*/
 
 //    @Bean
 //    public UserDetailsService userDetailsService() {
@@ -43,10 +45,10 @@ public class ProjectSecurityConfig {
 //        return new InMemoryUserDetailsManager(user, admin);
 //    }
 //
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-//    }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
 //
 //    @Bean
 //    public CompromisedPasswordChecker compromisedPasswordChecker(){
