@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-@Profile("!prod")
+@Profile("prod")
 @RequiredArgsConstructor
-public class EazyBankAuthenticationProvider implements AuthenticationProvider {
+public class EazyBankProdAuthenticationProvider implements AuthenticationProvider {
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
@@ -27,7 +27,11 @@ public class EazyBankAuthenticationProvider implements AuthenticationProvider {
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
         UserDetails userDetails = userDetailsService.loadUserByUsername(name);
-        return new UsernamePasswordAuthenticationToken(name, password, userDetails.getAuthorities());
+            if(passwordEncoder.matches(password, userDetails.getPassword())) {
+                return new UsernamePasswordAuthenticationToken(name, password, userDetails.getAuthorities());
+            }else{
+                throw new BadCredentialsException("invalid password");
+            }
 
     }
 
