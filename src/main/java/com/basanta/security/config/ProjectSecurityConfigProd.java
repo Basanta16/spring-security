@@ -1,6 +1,7 @@
 package com.basanta.security.config;
 
 
+import com.basanta.security.exception.CustomAccessDeniedHandler;
 import com.basanta.security.exception.CustomAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,15 +19,17 @@ public class ProjectSecurityConfigProd {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrfConfig -> csrfConfig.disable())
+        http.sessionManagement(smc->smc.invalidSessionUrl("/invalidSession").maximumSessions(1))
+                .csrf(csrfConfig-> csrfConfig.disable())
                 .authorizeHttpRequests((requests)-> requests
-                .requestMatchers("/api/**").authenticated()
-                .requestMatchers("/notices", "/contacts", "/error", "/register").permitAll());
+                        .requestMatchers("/api/**").authenticated()
+                        .requestMatchers("/notices", "/contacts", "/error","/invalidSession").permitAll());
 //        http.authorizeHttpRequests((requests)-> requests.anyRequest().denyAll());
 //        http.authorizeHttpRequests((requests)-> requests.anyRequest().permitAll());
         http.formLogin(withDefaults());
         http.httpBasic(hbc-> hbc.authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
+//        http.exceptionHandling(ehc -> ehc.authenticationEntryPoint(new CustomAuthenticationEntryPoint())); //global config
+        http.exceptionHandling(ehc->ehc.accessDeniedHandler(new CustomAccessDeniedHandler()).accessDeniedPage("/denied"));
         return http.build();
     }
 
